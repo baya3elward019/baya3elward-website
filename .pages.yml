@@ -1,0 +1,275 @@
+# Pages CMS configuration — https://pagescms.org
+# This file tells Pages CMS which forms to show for editing your site.
+# You normally never need to touch it.
+
+media:
+  input: public/images/uploads
+  output: /images/uploads
+
+content:
+  # ------------------------------------------------------------------ Profile
+  - name: profile
+    label: Profile & links
+    type: file
+    path: src/data/profile.json
+    format: json
+    fields:
+      - name: name
+        label: Full name
+        type: string
+        required: true
+      - name: handle
+        label: Handle (shown in the logo, e.g. baya3)
+        type: string
+        required: true
+      - name: avatar
+        label: Profile photo
+        type: image
+      - name: roles
+        label: Roles (the typing animation cycles through these)
+        type: string
+        list: true
+      - name: tagline
+        label: Tagline (one line under your name)
+        type: string
+      - name: bio
+        label: About me (leave an empty line between paragraphs)
+        type: text
+      - name: location
+        label: Location
+        type: string
+      - name: email
+        label: Email
+        type: string
+      - name: available
+        label: Show "Open to opportunities"
+        type: boolean
+      - name: cv
+        label: CV / resume (PDF, optional)
+        type: file
+      - name: skills
+        label: Skill groups
+        type: object
+        list: true
+        fields:
+          - name: group
+            label: Group name
+            type: string
+          - name: items
+            label: Skills
+            type: string
+            list: true
+      - name: tools
+        label: Tools
+        type: string
+        list: true
+      - name: socials
+        label: Social links
+        type: object
+        list: true
+        fields:
+          - name: platform
+            label: Platform
+            type: select
+            options:
+              values: [github, linkedin, telegram, whatsapp, tryhackme, hackthebox, x, youtube, instagram, facebook, medium, email, website]
+          - name: url
+            label: Link (for WhatsApp use https://wa.me/218XXXXXXXXX)
+            type: string
+      - name: siteTitle
+        label: Browser tab title
+        type: string
+      - name: siteDescription
+        label: Site description (for Google & link previews)
+        type: text
+
+  # ------------------------------------------------------------------ Write-ups
+  - name: writeups
+    label: Write-ups & articles
+    type: collection
+    path: src/content/writeups
+    filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      fields: [title, category, date, draft]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: description
+        label: Short description (shown on cards)
+        type: text
+      - name: date
+        label: Date
+        type: date
+        required: true
+      - name: category
+        label: Type
+        type: select
+        default: write-up
+        options:
+          values:
+            - name: write-up
+              label: Write-up
+            - name: article
+              label: Article
+            - name: experiment
+              label: Experiment
+            - name: news
+              label: News
+      - name: platform
+        label: Platform (e.g. TryHackMe, Hack The Box, Home lab)
+        type: string
+      - name: difficulty
+        label: Difficulty
+        type: select
+        options:
+          values: [Easy, Medium, Hard, Insane]
+      - name: tags
+        label: Tags
+        type: string
+        list: true
+      - name: cover
+        label: Cover image
+        type: image
+      - name: link
+        label: External link (optional)
+        type: string
+      - name: draft
+        label: Draft (hidden from the site)
+        type: boolean
+      - name: body
+        label: Content
+        type: rich-text
+        options:
+          format: markdown
+
+  # ------------------------------------------------------------------ Projects
+  - name: projects
+    label: Projects
+    type: collection
+    path: src/content/projects
+    filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      fields: [title, date, featured]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: description
+        label: Short description
+        type: text
+      - name: date
+        label: Date
+        type: date
+        required: true
+      - name: tags
+        label: Tech / tags
+        type: string
+        list: true
+      - name: cover
+        label: Cover image
+        type: image
+      - name: images
+        label: Screenshots
+        type: image
+        options:
+          multiple:
+            max: 12
+      - name: github
+        label: GitHub link
+        type: string
+      - name: demo
+        label: Live demo link
+        type: string
+      - name: featured
+        label: Featured (shown big on the home page)
+        type: boolean
+      - name: draft
+        label: Draft (hidden from the site)
+        type: boolean
+      - name: body
+        label: Details (optional — adds a project page)
+        type: rich-text
+        options:
+          format: markdown
+
+  # ------------------------------------------------------------------ Certificates
+  - name: certificates
+    label: Certificates
+    type: collection
+    path: src/content/certificates
+    filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      fields: [title, issuer, date]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Certificate name
+        type: string
+        required: true
+      - name: issuer
+        label: Issued by
+        type: string
+        required: true
+      - name: date
+        label: Date
+        type: date
+        required: true
+      - name: image
+        label: Certificate image
+        type: image
+      - name: link
+        label: Verification link (optional)
+        type: string
+      - name: draft
+        label: Draft (hidden from the site)
+        type: boolean
+
+  # ------------------------------------------------------------------ Gallery
+  - name: gallery
+    label: Gallery
+    type: collection
+    path: src/content/gallery
+    filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      fields: [title, date]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: image
+        label: Photo
+        type: image
+        required: true
+      - name: date
+        label: Date
+        type: date
+        required: true
+      - name: caption
+        label: Caption
+        type: string
+      - name: draft
+        label: Draft (hidden from the site)
+        type: boolean
