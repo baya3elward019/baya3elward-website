@@ -1,0 +1,17 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHead from '../components/SectionHead.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import { byDateDesc, published } from '../lib/utils';
+
+const items = (await getCollection('gallery')).filter(published).sort(byDateDesc);
+---
+<BaseLayout title="Gallery" description="Photos from events, labs and setups.">
+  <section class="section page-top">
+    <div class="wrap">
+      <SectionHead cmd="ls ~/photos" title="Gallery" lead="Events, labs, setups and moments along the way. Click a photo to open it." />
+      {items.length ? <GalleryGrid items={items} /> : <p class="empty">No photos yet.</p>}
+    </div>
+  </section>
+</BaseLayout>

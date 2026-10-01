@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import WriteupRow from '../../components/WriteupRow.astro';
+import { byDateDesc, published, categoryLabel } from '../../lib/utils';
+
+const entries = (await getCollection('writeups')).filter(published).sort(byDateDesc);
+
+const usedCats = [...new Set(entries.map((e) => e.data.category))];
+const categories = Object.entries(categoryLabel)
+  .filter(([v]) => usedCats.includes(v as any))
+  .map(([value, label]) => ({ value, label }));
+
+const tagCount = new Map<string, number>();
+entries.forEach((e) => e.data.tags.forEach((t) => tagCount.set(t, (tagCount.get(t) ?? 0) + 1)));
+const tags = [...tagCount.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 18).map(([t]) => t);
+---
+<BaseLayout title="Write-ups" description="Lab walkthroughs, CTF write-ups, experiments and articles.">
+  <section class="section page-top">
+    <div class="wrap">
+      <SectionHead cmd="ls -la ~/writeups" title="Write-ups & articles" lead="Lab walkthroughs, CTF rooms, experiments and notes. Search or filter by tag." />
+      {
+        entries.length ? (
+          <>
+            <FilterBar placeholder="Search write-ups…" categories={categories.length > 1 ? categories : []} tags={tags} />
+            <div class="wu-list" data-filter-list>
+              {entries.map((e, i) => (
+                <WriteupRow entry={e} index={i} />
+              ))}
+            </div>
+            <p class="empty" data-filter-empty hidden>
+              Nothing matches that search. Try another word or clear the tag filters.
+            </p>
+          </>
+        ) : (
+          <p class="empty">No write-ups yet.</p>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>

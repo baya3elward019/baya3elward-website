@@ -1,0 +1,29 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { img, formatDate } from '../lib/utils';
+
+interface Props {
+  items: CollectionEntry<'gallery'>[];
+  group?: string;
+}
+const { items, group = 'gallery' } = Astro.props;
+---
+<div class="masonry">
+  {
+    items.map((g, i) => {
+      const src = img(g.data.image)!;
+      const cap = g.data.caption ? `${g.data.title} — ${g.data.caption}` : g.data.title;
+      return (
+        <figure class="shot" data-reveal style={`--i:${i % 6}`}>
+          <button type="button" data-lb-open data-lb-group={group} data-src={src} data-caption={cap} aria-label={`View photo: ${g.data.title}`}>
+            <img src={src} alt={g.data.title} loading="lazy" decoding="async" />
+          </button>
+          <figcaption>
+            <span>{g.data.title}</span>
+            <time class="muted">{formatDate(g.data.date)}</time>
+          </figcaption>
+        </figure>
+      );
+    })
+  }
+</div>

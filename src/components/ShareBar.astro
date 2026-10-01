@@ -1,0 +1,32 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+const u = encodeURIComponent(pageUrl);
+const t = encodeURIComponent(title);
+const targets = [
+  { name: 'x', label: 'Share on X', href: `https://x.com/intent/post?text=${t}&url=${u}` },
+  { name: 'linkedin', label: 'Share on LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${u}` },
+  { name: 'telegram', label: 'Share on Telegram', href: `https://t.me/share/url?url=${u}&text=${t}` },
+  { name: 'whatsapp', label: 'Share on WhatsApp', href: `https://wa.me/?text=${t}%20${u}` },
+];
+---
+<div class="share glass">
+  <p class="toc-title">Share</p>
+  <div class="share-btns">
+    {
+      targets.map((s) => (
+        <a class="icon-btn" href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
+          <Icon name={s.name} size={17} />
+        </a>
+      ))
+    }
+    <button class="icon-btn" type="button" data-copy={pageUrl} data-copy-msg="Link copied" aria-label="Copy link">
+      <Icon name="link" size={17} />
+    </button>
+  </div>
+</div>

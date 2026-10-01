@@ -1,0 +1,22 @@
+---
+interface Props {
+  name: string;
+  handle: string;
+}
+const { name, handle } = Astro.props;
+const lines = [
+  '[ ok ] mounting /dev/portfolio',
+  '[ ok ] loading modules: recon, exploit, report',
+  `[ ok ] handshake with ${handle}@sec ... TLS 1.3`,
+  '[ ok ] decrypting profile',
+  'access granted',
+];
+---
+<div class="boot" data-boot data-lines={JSON.stringify(lines)} aria-hidden="true" transition:persist>
+  <div class="boot-inner">
+    <pre class="boot-log" data-boot-log></pre>
+    <div class="boot-name" data-boot-name data-text={name}>{name}</div>
+    <div class="boot-bar"><span data-boot-bar></span></div>
+    <p class="boot-skip">Press any key to skip</p>
+  </div>
+</div>

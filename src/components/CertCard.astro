@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { img, formatDate, isoDate } from '../lib/utils';
+
+interface Props {
+  entry: CollectionEntry<'certificates'>;
+  index?: number;
+  group?: string;
+}
+const { entry, index = 0, group = 'certs' } = Astro.props;
+const d = entry.data;
+const src = img(d.image);
+---
+<article
+  class="cert glass spot"
+  data-reveal
+  style={`--i:${Math.min(index, 8)}`}
+  data-filter-item
+  data-search={`${d.title} ${d.issuer}`.toLowerCase()}
+  data-date={d.date.getTime()}
+>
+  {
+    src ? (
+      <button class="cert-img" type="button" data-lb-open data-lb-group={group} data-src={src} data-caption={`${d.title} — ${d.issuer}`} aria-label={`View certificate: ${d.title}`}>
+        <img src={src} alt={`${d.title} certificate`} loading="lazy" decoding="async" />
+        <span class="cert-zoom"><Icon name="expand" size={18} /></span>
+      </button>
+    ) : (
+      <div class="cert-img cert-noimg"><Icon name="award" size={40} /></div>
+    )
+  }
+  <div class="cert-body">
+    <h3 class="cert-title">{d.title}</h3>
+    <p class="cert-issuer"><Icon name="shield" size={15} /> {d.issuer}</p>
+    <div class="cert-foot">
+      <time class="muted small" datetime={isoDate(d.date)}>{formatDate(d.date)}</time>
+      {d.link && (
+        <a class="small" href={d.link} target="_blank" rel="noopener noreferrer">
+          Verify <Icon name="external" size={13} />
+        </a>
+      )}
+    </div>
+  </div>
+</article>

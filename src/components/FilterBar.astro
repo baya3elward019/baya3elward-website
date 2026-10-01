@@ -1,0 +1,53 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  placeholder?: string;
+  categories?: { value: string; label: string }[];
+  tags?: string[];
+}
+const { placeholder = 'Search…', categories = [], tags = [] } = Astro.props;
+---
+<div class="filters glass" data-filters data-reveal>
+  <div class="filter-row">
+    <label class="search">
+      <Icon name="search" size={18} />
+      <span class="sr-only">Search</span>
+      <input type="search" placeholder={placeholder} data-filter-search autocomplete="off" spellcheck="false" />
+      <kbd aria-hidden="true">/</kbd>
+    </label>
+    <label class="sort">
+      <span class="sr-only">Sort</span>
+      <select data-filter-sort>
+        <option value="new">Newest first</option>
+        <option value="old">Oldest first</option>
+      </select>
+    </label>
+  </div>
+
+  {
+    categories.length > 0 && (
+      <div class="filter-group" role="group" aria-label="Filter by type">
+        <button class="chip" type="button" data-filter-cat="" aria-pressed="true">All</button>
+        {categories.map((c) => (
+          <button class="chip" type="button" data-filter-cat={c.value} aria-pressed="false">
+            {c.label}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    tags.length > 0 && (
+      <div class="filter-group" role="group" aria-label="Filter by tag">
+        {tags.map((t) => (
+          <button class="chip" type="button" data-filter-tag={t.toLowerCase()} aria-pressed="false">
+            #{t}
+          </button>
+        ))}
+      </div>
+    )
+  }
+  <p class="filter-count muted small" data-filter-count aria-live="polite"></p>
+</div>

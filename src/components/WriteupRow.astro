@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { url, formatDate, isoDate, categoryLabel, readingTime } from '../lib/utils';
+
+interface Props {
+  entry: CollectionEntry<'writeups'>;
+  index?: number;
+}
+const { entry, index = 0 } = Astro.props;
+const d = entry.data;
+const mins = readingTime(entry.body);
+---
+<article
+  class="wu-row glass spot"
+  data-reveal
+  style={`--i:${Math.min(index, 6)}`}
+  data-filter-item
+  data-category={d.category}
+  data-tags={d.tags.map((t) => t.toLowerCase()).join('|')}
+  data-search={`${d.title} ${d.description ?? ''} ${d.tags.join(' ')} ${d.platform ?? ''}`.toLowerCase()}
+  data-date={d.date.getTime()}
+>
+  <time class="wu-date" datetime={isoDate(d.date)}>
+    <span class="wu-day">{d.date.getUTCDate().toString().padStart(2, '0')}</span>
+    <span class="wu-mon">{formatDate(d.date).slice(3)}</span>
+  </time>
+  <div class="wu-main">
+    <div class="wu-kind">
+      <span class={`kind kind-${d.category}`}>{categoryLabel[d.category]}</span>
+      {d.platform && <span class="muted">on {d.platform}</span>}
+      {d.difficulty && <span class={`diff diff-${d.difficulty.toLowerCase()}`}>{d.difficulty}</span>}
+    </div>
+    <h3 class="wu-title">
+      <a class="stretched" href={url(`/writeups/${entry.id}/`)}>{d.title}</a>
+    </h3>
+    {d.description && <p class="wu-desc">{d.description}</p>}
+    {
+      d.tags.length > 0 && (
+        <ul class="tags">
+          {d.tags.map((t) => (
+            <li class="chip">#{t}</li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+  <div class="wu-meta">
+    <span><Icon name="clock" size={15} /> {mins} min</span>
+    <span class="wu-go" aria-hidden="true"><Icon name="arrow" size={18} /></span>
+  </div>
+</article>

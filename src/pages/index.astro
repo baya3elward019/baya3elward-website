@@ -1,0 +1,245 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHead from '../components/SectionHead.astro';
+import WriteupRow from '../components/WriteupRow.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import CertCard from '../components/CertCard.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import Icon from '../components/Icon.astro';
+import profile from '../data/profile.json';
+import { socialLabel } from '../lib/icons';
+import { url, img, byDateDesc, published } from '../lib/utils';
+
+const writeups = (await getCollection('writeups')).filter(published).sort(byDateDesc);
+const projects = (await getCollection('projects')).filter(published).sort(byDateDesc);
+const certs = (await getCollection('certificates')).filter(published).sort(byDateDesc);
+const gallery = (await getCollection('gallery')).filter(published).sort(byDateDesc);
+
+// Featured projects first, then newest
+const homeProjects = [...projects].sort((a, b) => Number(b.data.featured) - Number(a.data.featured)).slice(0, 3);
+
+const socials = (profile.socials ?? []).filter((s) => s?.url);
+const bio = (profile.bio ?? '').split(/\n\s*\n/).filter(Boolean);
+const avatar = img(profile.avatar);
+
+const contactLines = [
+  profile.email && { key: 'email', label: profile.email, href: `mailto:${profile.email}` },
+  ...socials.map((s) => ({ key: s.platform, label: socialLabel[s.platform] ?? s.platform, href: s.url })),
+].filter(Boolean) as { key: string; label: string; href: string }[];
+---
+<BaseLayout>
+  <!-- ============================== HERO ============================== -->
+  <section class="hero" aria-labelledby="hero-name">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="hero-prompt" data-hero-step><span class="accent">$</span> whoami</p>
+        <h1 id="hero-name" class="hero-name" data-scramble data-hero-step>{profile.name}</h1>
+        <p class="hero-role" data-hero-step>
+          <span class="muted" aria-hidden="true">&gt;&nbsp;</span>
+          <span class="typing" data-typing data-words={JSON.stringify(profile.roles ?? [])}>{profile.roles?.[0]}</span><span class="caret" aria-hidden="true"></span>
+        </p>
+        {profile.tagline && <p class="hero-tagline" data-hero-step>{profile.tagline}</p>}
+        <div class="hero-cta" data-hero-step>
+          <a class="btn btn-primary" href={url('/writeups/')}>Read my write-ups <Icon name="arrow" size={16} class="icon-slide" /></a>
+          <a class="btn" href="#contact">Get in touch</a>
+        </div>
+        <ul class="hero-status" data-hero-step>
+          {profile.location && <li><Icon name="pin" size={15} /> {profile.location}</li>}
+          {profile.available && <li><span class="pulse" aria-hidden="true"></span> Open to opportunities</li>}
+          {profile.cv && <li><a href={img(profile.cv)} target="_blank" rel="noopener"><Icon name="file" size={15} /> Download CV</a></li>}
+        </ul>
+      </div>
+
+      <div class="hero-visual" data-hero-step>
+        <div class="avatar-rig" data-parallax>
+          <span class="ring ring-1" aria-hidden="true"></span>
+          <span class="ring ring-2" aria-hidden="true"></span>
+          <span class="ring ring-3" aria-hidden="true"><i></i><i></i><i></i></span>
+          <div class="avatar">
+            {avatar ? <img src={avatar} alt={profile.name} width="320" height="320" /> : <Icon name="shield" size={80} />}
+            <span class="avatar-scan" aria-hidden="true"></span>
+          </div>
+        </div>
+        <dl class="readout glass">
+          <div><dt>write-ups</dt><dd data-count={writeups.length}>{writeups.length}</dd></div>
+          <div><dt>projects</dt><dd data-count={projects.length}>{projects.length}</dd></div>
+          <div><dt>certificates</dt><dd data-count={certs.length}>{certs.length}</dd></div>
+        </dl>
+      </div>
+    </div>
+    <a class="scroll-hint" href="#about" aria-label="Scroll to About"><span></span></a>
+  </section>
+
+  <!-- ============================== ABOUT ============================== -->
+  <section class="section" id="about">
+    <div class="wrap">
+      <SectionHead cmd="cat about.md" title="About me" />
+      <div class="about-grid">
+        <div class="about-bio" data-reveal>
+          {bio.map((p) => <p>{p}</p>)}
+          {
+            socials.length > 0 && (
+              <ul class="social-row">
+                {socials.map((s) => (
+                  <li>
+                    <a class="btn btn-sm" href={s.url} target="_blank" rel="noopener noreferrer">
+                      <Icon name={s.platform} size={16} /> {socialLabel[s.platform] ?? s.platform}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+        </div>
+
+        <div class="skills">
+          {
+            (profile.skills ?? []).map((g, i) => (
+              <div class="skill-mod glass spot" data-reveal style={`--i:${i}`}>
+                <h3>
+                  <span class="mod-dot" aria-hidden="true" />
+                  {g.group}
+                </h3>
+                <ul>
+                  {(g.items ?? []).map((s) => (
+                    <li>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+          {
+            profile.tools?.length > 0 && (
+              <div class="tools glass" data-reveal style="--i:4">
+                <h3>Toolbox</h3>
+                <ul class="tags">
+                  {profile.tools.map((t) => (
+                    <li class="chip chip-accent">{t}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== WRITE-UPS ============================== -->
+  <section class="section" id="writeups">
+    <div class="wrap">
+      <SectionHead cmd="ls -t ~/writeups | head -3" title="Latest write-ups" lead="Walkthroughs of labs and CTF rooms, notes from experiments, and short articles.">
+        <a class="link-more" href={url('/writeups/')}>All write-ups <Icon name="arrow" size={16} /></a>
+      </SectionHead>
+      {
+        writeups.length ? (
+          <div class="wu-list">
+            {writeups.slice(0, 3).map((w, i) => (
+              <WriteupRow entry={w} index={i} />
+            ))}
+          </div>
+        ) : (
+          <p class="empty">No write-ups yet. Add your first one from Pages CMS.</p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- ============================== PROJECTS ============================== -->
+  <section class="section" id="projects">
+    <div class="wrap">
+      <SectionHead cmd="ls ~/projects" title="Projects" lead="Things I built, from security tooling to full-stack apps.">
+        <a class="link-more" href={url('/projects/')}>All projects <Icon name="arrow" size={16} /></a>
+      </SectionHead>
+      {
+        homeProjects.length ? (
+          <div class="project-grid">
+            {homeProjects.map((p, i) => (
+              <ProjectCard entry={p} index={i} large={i === 0} />
+            ))}
+          </div>
+        ) : (
+          <p class="empty">No projects yet.</p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- ============================== CERTIFICATES ============================== -->
+  <section class="section" id="certificates">
+    <div class="wrap">
+      <SectionHead cmd="ls ~/certs" title="Certificates" lead="Click any certificate to see it full size.">
+        <a class="link-more" href={url('/certificates/')}>All certificates <Icon name="arrow" size={16} /></a>
+      </SectionHead>
+      {
+        certs.length ? (
+          <div class="cert-grid">
+            {certs.slice(0, 4).map((c, i) => (
+              <CertCard entry={c} index={i} group="home-certs" />
+            ))}
+          </div>
+        ) : (
+          <p class="empty">No certificates yet.</p>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- ============================== GALLERY ============================== -->
+  {
+    gallery.length > 0 && (
+      <section class="section" id="gallery">
+        <div class="wrap">
+          <SectionHead cmd="ls ~/photos" title="Gallery" lead="Events, labs, setups and moments along the way.">
+            <a class="link-more" href={url('/gallery/')}>
+              Full gallery <Icon name="arrow" size={16} />
+            </a>
+          </SectionHead>
+          <GalleryGrid items={gallery.slice(0, 6)} group="home-gallery" />
+        </div>
+      </section>
+    )
+  }
+
+  <!-- ============================== CONTACT ============================== -->
+  <section class="section" id="contact">
+    <div class="wrap contact-wrap">
+      <SectionHead cmd="./contact --list" title="Get in touch" lead="Want to collaborate, talk about a lab, or have an opportunity? Reach me on any of these." />
+      <div class="term glass" data-reveal>
+        <div class="term-bar">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="term-title">{profile.handle}@sec: ~/contact</span>
+        </div>
+        <div class="term-body">
+          <p class="term-line"><span class="accent">$</span> ./contact --list</p>
+          <ul class="contact-list">
+            {
+              contactLines.map((c, i) => (
+                <li style={`--i:${i}`}>
+                  <a href={c.href} target={c.key === 'email' ? undefined : '_blank'} rel="noopener noreferrer">
+                    <Icon name={c.key} size={18} />
+                    <span class="c-key">{c.key}</span>
+                    <span class="c-val">{c.label}</span>
+                    <Icon name="chevron" size={16} class="c-go" />
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          {
+            profile.email && (
+              <p class="term-line">
+                <span class="accent">$</span>{' '}
+                <button class="linklike" type="button" data-copy={profile.email}>
+                  copy email <Icon name="copy" size={14} />
+                </button>
+              </p>
+            )
+          }
+          <p class="term-line"><span class="accent">$</span> <span class="caret" aria-hidden="true"></span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

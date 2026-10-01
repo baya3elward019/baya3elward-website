@@ -1,0 +1,78 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import ShareBar from '../../components/ShareBar.astro';
+import { url, img, formatDate, isoDate, published } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const all = (await getCollection('projects')).filter(published).filter((p) => p.body?.trim());
+  return all.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+}
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const shots = [d.cover, ...d.images].filter(Boolean).map((s) => img(s)!) as string[];
+const unique = [...new Set(shots)];
+---
+<BaseLayout title={d.title} description={d.description} image={d.cover ?? d.images[0]} type="article">
+  <article class="post page-top">
+    <div class="wrap">
+      <a class="back" href={url('/projects/')}><Icon name="back" size={16} /> All projects</a>
+
+      <header class="post-head" data-reveal>
+        <h1 class="post-title" data-scramble>{d.title}</h1>
+        {d.description && <p class="post-lead">{d.description}</p>}
+        <div class="post-meta">
+          <span><Icon name="calendar" size={15} /> <time datetime={isoDate(d.date)}>{formatDate(d.date, 'long')}</time></span>
+        </div>
+        {
+          d.tags.length > 0 && (
+            <ul class="tags">
+              {d.tags.map((t) => (
+                <li class="chip">{t}</li>
+              ))}
+            </ul>
+          )
+        }
+        <div class="project-links">
+          {d.github && (
+            <a class="btn" href={d.github} target="_blank" rel="noopener noreferrer">
+              <Icon name="github" size={16} /> Source code
+            </a>
+          )}
+          {d.demo && (
+            <a class="btn btn-primary" href={d.demo} target="_blank" rel="noopener noreferrer">
+              <Icon name="external" size={16} /> Live demo
+            </a>
+          )}
+        </div>
+      </header>
+
+      {
+        unique.length > 0 && (
+          <div class:list={['shots', { 'shots-one': unique.length === 1 }]} data-reveal>
+            {unique.map((s, i) => (
+              <button type="button" class="glass" data-lb-open data-lb-group="project" data-src={s} data-caption={`${d.title} — ${i + 1}/${unique.length}`} aria-label={`View screenshot ${i + 1}`}>
+                <img src={s} alt="" loading={i > 1 ? 'lazy' : undefined} />
+              </button>
+            ))}
+          </div>
+        )
+      }
+
+      <div class="post-layout">
+        <div class="prose" data-prose>
+          <Content />
+        </div>
+        <aside class="post-aside">
+          <ShareBar title={d.title} />
+        </aside>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

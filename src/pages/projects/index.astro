@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/SectionHead.astro';
+import FilterBar from '../../components/FilterBar.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { byDateDesc, published } from '../../lib/utils';
+
+const entries = (await getCollection('projects')).filter(published).sort(byDateDesc);
+const tagCount = new Map<string, number>();
+entries.forEach((e) => e.data.tags.forEach((t) => tagCount.set(t, (tagCount.get(t) ?? 0) + 1)));
+const tags = [...tagCount.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 16).map(([t]) => t);
+---
+<BaseLayout title="Projects" description="Security tooling, full-stack apps and lab builds.">
+  <section class="section page-top">
+    <div class="wrap">
+      <SectionHead cmd="ls -la ~/projects" title="Projects" lead="Security tooling, full-stack apps and lab builds." />
+      {
+        entries.length ? (
+          <>
+            <FilterBar placeholder="Search projects…" tags={tags} />
+            <div class="project-grid" data-filter-list>
+              {entries.map((p, i) => (
+                <ProjectCard entry={p} index={i} />
+              ))}
+            </div>
+            <p class="empty" data-filter-empty hidden>Nothing matches that search.</p>
+          </>
+        ) : (
+          <p class="empty">No projects yet.</p>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>

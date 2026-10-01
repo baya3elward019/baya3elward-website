@@ -1,0 +1,66 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { url, img, formatDate, isoDate } from '../lib/utils';
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  index?: number;
+  large?: boolean;
+}
+const { entry, index = 0, large = false } = Astro.props;
+const d = entry.data;
+const cover = img(d.cover ?? d.images[0]);
+const hasBody = !!entry.body?.trim();
+const href = hasBody ? url(`/projects/${entry.id}/`) : d.demo ?? d.github;
+const external = !hasBody && !!href;
+---
+<article
+  class:list={['project glass spot', { 'project-lg': large, 'no-cover': !cover }]}
+  data-reveal
+  data-tilt
+  style={`--i:${Math.min(index, 6)}`}
+  data-filter-item
+  data-tags={d.tags.map((t) => t.toLowerCase()).join('|')}
+  data-search={`${d.title} ${d.description ?? ''} ${d.tags.join(' ')}`.toLowerCase()}
+  data-date={d.date.getTime()}
+>
+  <div class="project-media">
+    {cover ? <img src={cover} alt="" loading="lazy" decoding="async" /> : <div class="project-placeholder"><Icon name="terminal" size={42} /></div>}
+    <span class="scan" aria-hidden="true"></span>
+  </div>
+  <div class="project-body">
+    <time class="muted small" datetime={isoDate(d.date)}>{formatDate(d.date)}</time>
+    <h3 class="project-title">
+      {href ? (
+        <a class="stretched" href={href} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
+          {d.title}
+        </a>
+      ) : (
+        d.title
+      )}
+    </h3>
+    {d.description && <p class="project-desc">{d.description}</p>}
+    {
+      d.tags.length > 0 && (
+        <ul class="tags">
+          {d.tags.map((t) => (
+            <li class="chip">{t}</li>
+          ))}
+        </ul>
+      )
+    }
+    <div class="project-links">
+      {d.github && (
+        <a class="btn btn-sm lift" href={d.github} target="_blank" rel="noopener noreferrer">
+          <Icon name="github" size={15} /> Code
+        </a>
+      )}
+      {d.demo && (
+        <a class="btn btn-sm lift" href={d.demo} target="_blank" rel="noopener noreferrer">
+          <Icon name="external" size={15} /> Live demo
+        </a>
+      )}
+    </div>
+  </div>
+</article>

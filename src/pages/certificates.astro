@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHead from '../components/SectionHead.astro';
+import FilterBar from '../components/FilterBar.astro';
+import CertCard from '../components/CertCard.astro';
+import { byDateDesc, published } from '../lib/utils';
+
+const entries = (await getCollection('certificates')).filter(published).sort(byDateDesc);
+---
+<BaseLayout title="Certificates" description="Courses, learning paths and certifications I've completed.">
+  <section class="section page-top">
+    <div class="wrap">
+      <SectionHead cmd="ls -la ~/certs" title="Certificates" lead="Courses, learning paths and certifications. Click a certificate to view it full size." />
+      {
+        entries.length ? (
+          <>
+            {entries.length > 4 && <FilterBar placeholder="Search by title or issuer…" />}
+            <div class="cert-grid" data-filter-list>
+              {entries.map((c, i) => (
+                <CertCard entry={c} index={i} />
+              ))}
+            </div>
+            <p class="empty" data-filter-empty hidden>Nothing matches that search.</p>
+          </>
+        ) : (
+          <p class="empty">No certificates yet.</p>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>

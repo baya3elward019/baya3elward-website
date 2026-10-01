@@ -1,0 +1,92 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import profile from '../data/profile.json';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import BootScreen from '../components/BootScreen.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { img } from '../lib/utils';
+// Fonts are bundled with the site (no Google Fonts request)
+import '@fontsource/chakra-petch/latin-500.css';
+import '@fontsource/chakra-petch/latin-600.css';
+import '@fontsource/chakra-petch/latin-700.css';
+import '@fontsource/ibm-plex-mono/latin-400.css';
+import '@fontsource/ibm-plex-mono/latin-400-italic.css';
+import '@fontsource/ibm-plex-mono/latin-500.css';
+import '@fontsource/ibm-plex-mono/latin-600.css';
+import '../styles/global.css';
+import '../styles/components.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+}
+
+const { title, description = profile.siteDescription, image, type = 'website' } = Astro.props;
+const fullTitle = title ? `${title} | ${profile.handle}` : profile.siteTitle;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = image ? new URL(img(image)!, Astro.site).href : undefined;
+---
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#04070f" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.svg`} />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+
+    <!-- Theme + boot screen decided before first paint (no flash) -->
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        function apply() {
+          var t;
+          try { t = localStorage.getItem('theme'); } catch (e) {}
+          if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          d.setAttribute('data-theme', t);
+          d.classList.add('js');
+        }
+        apply();
+        document.addEventListener('astro:after-swap', apply);
+
+        var seen = false;
+        try { seen = sessionStorage.getItem('booted') === '1'; } catch (e) {}
+        if (!seen && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          d.classList.add('booting');
+          setTimeout(function () { d.classList.remove('booting'); }, 5000);
+        }
+      })();
+    </script>
+    <ClientRouter fallback="swap" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <BootScreen name={profile.name} handle={profile.handle} />
+    <canvas id="net-bg" aria-hidden="true" transition:persist></canvas>
+    <Nav />
+    <main id="main" transition:animate="fade">
+      <slot />
+    </main>
+    <Footer />
+    <Lightbox />
+    <div class="toast" role="status" aria-live="polite" transition:persist>
+      <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+      <span class="toast-msg"></span>
+    </div>
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>

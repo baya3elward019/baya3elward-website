@@ -1,0 +1,33 @@
+{
+  "siteTitle": "baya3 — security portfolio",
+  "siteDescription": "Write-ups, projects and certificates from my work in cybersecurity and full-stack development.",
+  "name": "Baya3 Elward",
+  "handle": "baya3",
+  "roles": [
+    "Security engineer in training",
+    "CTF player",
+    "Full-stack developer",
+    "Network tinkerer"
+  ],
+  "tagline": "I break things in labs so they don't break in production.",
+  "bio": "I'm working through the Security Engineer path on TryHackMe while building full-stack apps on the side. I like understanding systems end to end: how the packets move, how the backend trusts them, and where that trust goes wrong.\n\nThis site is where I keep my write-ups, lab experiments, projects and certificates.",
+  "avatar": "/images/samples/avatar.svg",
+  "location": "Tripoli, Libya",
+  "email": "baya3.elward017@gmail.com",
+  "available": true,
+  "cv": "",
+  "skills": [
+    { "group": "Offensive", "items": ["Web app testing", "Enumeration", "Privilege escalation", "OWASP Top 10"] },
+    { "group": "Defensive", "items": ["Log analysis", "Hardening", "Threat modeling", "Incident basics"] },
+    { "group": "Networking", "items": ["Subnetting", "VLANs", "Routing", "Packet Tracer"] },
+    { "group": "Development", "items": ["JavaScript / TypeScript", "React", "Node.js", "Python"] }
+  ],
+  "tools": ["Burp Suite", "Nmap", "Wireshark", "Metasploit", "Gobuster", "Linux", "Git", "Docker"],
+  "socials": [
+    { "platform": "github", "url": "https://github.com/baya3elward019" },
+    { "platform": "linkedin", "url": "https://www.linkedin.com/" },
+    { "platform": "tryhackme", "url": "https://tryhackme.com/" },
+    { "platform": "telegram", "url": "https://t.me/" },
+    { "platform": "whatsapp", "url": "https://wa.me/" }
+  ]
+}

@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { url } from '../lib/utils';
+---
+<BaseLayout title="404">
+  <section class="section page-top notfound">
+    <div class="wrap">
+      <div class="term glass">
+        <div class="term-bar">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="term-title">bash</span>
+        </div>
+        <div class="term-body">
+          <p class="term-line"><span class="accent">$</span> cd {Astro.url.pathname}</p>
+          <p class="term-line err">bash: cd: No such file or directory</p>
+          <h1 class="nf-code" data-scramble>404</h1>
+          <p>This page doesn't exist, or it was moved.</p>
+          <a class="btn btn-primary" href={url('/')}><Icon name="back" size={16} /> Back to home</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

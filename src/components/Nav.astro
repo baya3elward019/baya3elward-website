@@ -1,0 +1,51 @@
+---
+import Icon from './Icon.astro';
+import profile from '../data/profile.json';
+import { url } from '../lib/utils';
+
+const links = [
+  { href: '/', label: 'Home', match: (p: string) => p === '/' },
+  { href: '/#about', label: 'About', match: () => false },
+  { href: '/writeups/', label: 'Write-ups', match: (p: string) => p.startsWith('/writeups') },
+  { href: '/projects/', label: 'Projects', match: (p: string) => p.startsWith('/projects') },
+  { href: '/certificates/', label: 'Certificates', match: (p: string) => p.startsWith('/certificates') },
+  { href: '/gallery/', label: 'Gallery', match: (p: string) => p.startsWith('/gallery') },
+  { href: '/#contact', label: 'Contact', match: () => false },
+];
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = Astro.url.pathname.replace(base, '') || '/';
+---
+<header class="nav" data-nav>
+  <div class="wrap nav-inner">
+    <a class="logo" href={url('/')} aria-label={`${profile.name}, home`}>
+      <span class="logo-user">{profile.handle}</span><span class="logo-at">@</span><span class="logo-host">sec</span><span class="logo-path">:~$</span><span class="caret" aria-hidden="true"></span>
+    </a>
+
+    <nav class="nav-links" id="nav-links" aria-label="Main">
+      <ul>
+        {
+          links.map((l) => (
+            <li>
+              <a href={url(l.href)} aria-current={l.match(path) ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Switch color theme">
+        <span class="theme-icon theme-icon-dark"><Icon name="moon" size={18} /></span>
+        <span class="theme-icon theme-icon-light"><Icon name="sun" size={18} /></span>
+      </button>
+      <button class="icon-btn menu-toggle" type="button" data-menu-toggle aria-controls="nav-links" aria-expanded="false" aria-label="Open menu">
+        <span class="menu-open"><Icon name="menu" size={20} /></span>
+        <span class="menu-close"><Icon name="close" size={20} /></span>
+      </button>
+    </div>
+  </div>
+  <div class="nav-progress" data-progress aria-hidden="true"></div>
+</header>

@@ -1,0 +1,17 @@
+---
+interface Props {
+  cmd: string;
+  title: string;
+  lead?: string;
+  id?: string;
+}
+const { cmd, title, lead, id } = Astro.props;
+---
+<div class="section-head" data-reveal>
+  <div>
+    <span class="prompt" aria-hidden="true"><b>$</b> {cmd}</span>
+    <h2 id={id}>{title}</h2>
+    {lead && <p>{lead}</p>}
+  </div>
+  <slot />
+</div>

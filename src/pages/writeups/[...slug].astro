@@ -1,0 +1,112 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import ShareBar from '../../components/ShareBar.astro';
+import { url, img, formatDate, isoDate, readingTime, categoryLabel, byDateDesc, published } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const all = (await getCollection('writeups')).filter(published).sort(byDateDesc);
+  return all.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, newer: all[i - 1], older: all[i + 1] },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'writeups'>;
+  newer?: CollectionEntry<'writeups'>;
+  older?: CollectionEntry<'writeups'>;
+}
+const { entry, newer, older } = Astro.props;
+const d = entry.data;
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const cover = img(d.cover);
+---
+<BaseLayout title={d.title} description={d.description} image={d.cover} type="article">
+  <article class="post page-top">
+    <div class="wrap">
+      <a class="back" href={url('/writeups/')}><Icon name="back" size={16} /> All write-ups</a>
+
+      <header class="post-head" data-reveal>
+        <div class="wu-kind">
+          <span class={`kind kind-${d.category}`}>{categoryLabel[d.category]}</span>
+          {d.platform && <span class="muted">on {d.platform}</span>}
+          {d.difficulty && <span class={`diff diff-${d.difficulty.toLowerCase()}`}>{d.difficulty}</span>}
+        </div>
+        <h1 class="post-title" data-scramble>{d.title}</h1>
+        {d.description && <p class="post-lead">{d.description}</p>}
+        <div class="post-meta">
+          <span><Icon name="calendar" size={15} /> <time datetime={isoDate(d.date)}>{formatDate(d.date, 'long')}</time></span>
+          <span><Icon name="clock" size={15} /> {readingTime(entry.body)} min read</span>
+          {d.link && (
+            <a href={d.link} target="_blank" rel="noopener noreferrer">
+              <Icon name="external" size={15} /> Original link
+            </a>
+          )}
+        </div>
+        {
+          d.tags.length > 0 && (
+            <ul class="tags">
+              {d.tags.map((t) => (
+                <li class="chip">#{t}</li>
+              ))}
+            </ul>
+          )
+        }
+      </header>
+
+      {
+        cover && (
+          <figure class="post-cover glass" data-reveal>
+            <button type="button" data-lb-open data-lb-group="post" data-src={cover} data-caption={d.title} aria-label="View cover image full size">
+              <img src={cover} alt="" />
+            </button>
+          </figure>
+        )
+      }
+
+      <div class:list={['post-layout', { 'has-toc': toc.length > 1 }]}>
+        <div class="prose" data-prose>
+          <Content />
+        </div>
+
+        <aside class="post-aside">
+          {
+            toc.length > 1 && (
+              <nav class="toc glass" aria-label="On this page">
+                <p class="toc-title">On this page</p>
+                <ol>
+                  {toc.map((h) => (
+                    <li class={`toc-d${h.depth}`}>
+                      <a href={`#${h.slug}`} data-toc-link={h.slug}>
+                        {h.text}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )
+          }
+          <ShareBar title={d.title} />
+        </aside>
+      </div>
+
+      <nav class="post-nav" aria-label="More write-ups">
+        {newer ? (
+          <a class="glass spot" href={url(`/writeups/${newer.id}/`)}>
+            <span class="muted small">Newer</span>
+            <span>{newer.data.title}</span>
+          </a>
+        ) : <span />}
+        {older && (
+          <a class="glass spot align-end" href={url(`/writeups/${older.id}/`)}>
+            <span class="muted small">Older</span>
+            <span>{older.data.title}</span>
+          </a>
+        )}
+      </nav>
+    </div>
+  </article>
+</BaseLayout>
