@@ -3,7 +3,7 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import ShareBar from '../../components/ShareBar.astro';
-import { url, img, formatDate, isoDate, published } from '../../lib/utils';
+import { url, img, formatDate, isoDate, published, launchLabel } from '../../lib/utils';
 
 export async function getStaticPaths() {
   const all = (await getCollection('projects')).filter(published).filter((p) => p.body?.trim());
@@ -40,14 +40,14 @@ const unique = [...new Set(shots)];
           )
         }
         <div class="project-links">
+          {d.demo && (
+            <a class="btn btn-primary btn-launch" href={d.demo} target="_blank" rel="noopener noreferrer">
+              <Icon name={d.kind === 'game' ? 'play' : 'external'} size={18} /> {launchLabel[d.kind]}
+            </a>
+          )}
           {d.github && (
             <a class="btn" href={d.github} target="_blank" rel="noopener noreferrer">
               <Icon name="github" size={16} /> Source code
-            </a>
-          )}
-          {d.demo && (
-            <a class="btn btn-primary" href={d.demo} target="_blank" rel="noopener noreferrer">
-              <Icon name="external" size={16} /> Live demo
             </a>
           )}
         </div>

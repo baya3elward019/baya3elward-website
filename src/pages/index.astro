@@ -17,7 +17,7 @@ const certs = (await getCollection('certificates')).filter(published).sort(byDat
 const gallery = (await getCollection('gallery')).filter(published).sort(byDateDesc);
 
 // Featured projects first, then newest
-const homeProjects = [...projects].sort((a, b) => Number(b.data.featured) - Number(a.data.featured)).slice(0, 3);
+const homeProjects = [...projects].sort((a, b) => Number(b.data.featured) - Number(a.data.featured)).slice(0, 6);
 
 const socials = (profile.socials ?? []).filter((s) => s?.url);
 const bio = (profile.bio ?? '').split(/\n\s*\n/).filter(Boolean);
@@ -149,14 +149,14 @@ const contactLines = [
   <!-- ============================== PROJECTS ============================== -->
   <section class="section" id="projects">
     <div class="wrap">
-      <SectionHead cmd="ls ~/projects" title="Projects" lead="Things I built, from security tooling to full-stack apps.">
+      <SectionHead cmd="ls ~/projects" title="Projects" lead="Games, apps and lab builds. Hit the button on any card to open it live.">
         <a class="link-more" href={url('/projects/')}>All projects <Icon name="arrow" size={16} /></a>
       </SectionHead>
       {
         homeProjects.length ? (
           <div class="project-grid">
             {homeProjects.map((p, i) => (
-              <ProjectCard entry={p} index={i} large={i === 0} />
+              <ProjectCard entry={p} index={i} />
             ))}
           </div>
         ) : (

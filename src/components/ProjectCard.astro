@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import { url, img, formatDate, isoDate } from '../lib/utils';
+import { url, img, formatDate, isoDate, launchLabel, kindLabel } from '../lib/utils';
 
 interface Props {
   entry: CollectionEntry<'projects'>;
@@ -14,6 +14,7 @@ const cover = img(d.cover ?? d.images[0]);
 const hasBody = !!entry.body?.trim();
 const href = hasBody ? url(`/projects/${entry.id}/`) : d.demo ?? d.github;
 const external = !hasBody && !!href;
+const isGame = d.kind === 'game';
 ---
 <article
   class:list={['project glass spot', { 'project-lg': large, 'no-cover': !cover }]}
@@ -28,6 +29,15 @@ const external = !hasBody && !!href;
   <div class="project-media">
     {cover ? <img src={cover} alt="" loading="lazy" decoding="async" /> : <div class="project-placeholder"><Icon name="terminal" size={42} /></div>}
     <span class="scan" aria-hidden="true"></span>
+    {kindLabel[d.kind] && (
+      <span class="project-kind"><Icon name={isGame ? 'gamepad' : 'website'} size={14} /> {kindLabel[d.kind]}</span>
+    )}
+    {d.demo && (
+      <a class="project-launch lift" href={d.demo} target="_blank" rel="noopener noreferrer" aria-label={`${launchLabel[d.kind]}: ${d.title}`}>
+        <span class="launch-disc"><Icon name={isGame ? 'play' : 'external'} size={22} /></span>
+        <span class="launch-text">{launchLabel[d.kind]}</span>
+      </a>
+    )}
   </div>
   <div class="project-body">
     <time class="muted small" datetime={isoDate(d.date)}>{formatDate(d.date)}</time>
@@ -51,14 +61,14 @@ const external = !hasBody && !!href;
       )
     }
     <div class="project-links">
+      {d.demo && (
+        <a class="btn btn-sm btn-primary lift" href={d.demo} target="_blank" rel="noopener noreferrer">
+          <Icon name={isGame ? 'play' : 'external'} size={15} /> {launchLabel[d.kind]}
+        </a>
+      )}
       {d.github && (
         <a class="btn btn-sm lift" href={d.github} target="_blank" rel="noopener noreferrer">
           <Icon name="github" size={15} /> Code
-        </a>
-      )}
-      {d.demo && (
-        <a class="btn btn-sm lift" href={d.demo} target="_blank" rel="noopener noreferrer">
-          <Icon name="external" size={15} /> Live demo
         </a>
       )}
     </div>

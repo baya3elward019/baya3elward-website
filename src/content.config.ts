@@ -43,6 +43,10 @@ const projects = defineCollection({
     tags: list,
     cover: text,
     images: list,
+    kind: z
+      .enum(['game', 'app', 'site', 'tool', 'other'])
+      .nullish()
+      .transform((v) => v ?? 'other'),
     github: text,
     demo: text,
     featured: flag,

@@ -44,3 +44,18 @@ export const byDateDesc = <T extends { data: { date: Date } }>(a: T, b: T) =>
   b.data.date.getTime() - a.data.date.getTime();
 
 export const published = <T extends { data: { draft?: boolean } }>(e: T) => !e.data.draft;
+
+/** Button text for a project's live link, by project type. */
+export const launchLabel: Record<string, string> = {
+  game: 'Play now',
+  app: 'Open app',
+  site: 'Visit site',
+  tool: 'Try it',
+  other: 'Open live',
+};
+export const kindLabel: Record<string, string> = {
+  game: 'Game',
+  app: 'Web app',
+  site: 'Website',
+  tool: 'Tool',
+};

@@ -187,11 +187,26 @@ content:
         options:
           multiple:
             max: 12
+      - name: kind
+        label: Type (decides the button text — Game shows "Play now")
+        type: select
+        options:
+          values:
+            - name: game
+              label: Game
+            - name: app
+              label: Web app
+            - name: site
+              label: Website
+            - name: tool
+              label: Tool
+            - name: other
+              label: Other
       - name: github
         label: GitHub link
         type: string
       - name: demo
-        label: Live demo link
+        label: Live link (the game / site itself — adds the Play / Open button)
         type: string
       - name: featured
         label: Featured (shown big on the home page)
